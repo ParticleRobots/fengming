@@ -21,8 +21,8 @@ int motorright = 5;
 int tempo = 114;
 
 // change this to whichever pin you want to use
-int buzzer = 6;
-
+int buzzer = 7;
+/*
 // notes of the moledy followed by the duration.
 // a 4 means a quarter note, 8 an eighteenth , 16 sixteenth, so on
 // !!negative numbers are used to represent dotted notes,
@@ -100,7 +100,66 @@ int melody[] = {
 
   NOTE_E5, 4, NOTE_D5, 2, REST, 4
 };
+*/
+/*
+int melody[] = {
 
+  // Take on me, by A-ha
+  // Score available at https://musescore.com/user/27103612/scores/4834399
+  // Arranged by Edward Truong
+
+  NOTE_FS5,8, NOTE_FS5,8,NOTE_D5,8, NOTE_B4,8, REST,8, NOTE_B4,8, REST,8, NOTE_E5,8, 
+  REST,8, NOTE_E5,8, REST,8, NOTE_E5,8, NOTE_GS5,8, NOTE_GS5,8, NOTE_A5,8, NOTE_B5,8,
+  NOTE_A5,8, NOTE_A5,8, NOTE_A5,8, NOTE_E5,8, REST,8, NOTE_D5,8, REST,8, NOTE_FS5,8, 
+  REST,8, NOTE_FS5,8, REST,8, NOTE_FS5,8, NOTE_E5,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,8,
+  NOTE_FS5,8, NOTE_FS5,8,NOTE_D5,8, NOTE_B4,8, REST,8, NOTE_B4,8, REST,8, NOTE_E5,8, 
+  
+  REST,8, NOTE_E5,8, REST,8, NOTE_E5,8, NOTE_GS5,8, NOTE_GS5,8, NOTE_A5,8, NOTE_B5,8,
+  NOTE_A5,8, NOTE_A5,8, NOTE_A5,8, NOTE_E5,8, REST,8, NOTE_D5,8, REST,8, NOTE_FS5,8, 
+  REST,8, NOTE_FS5,8, REST,8, NOTE_FS5,8, NOTE_E5,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,8,
+  NOTE_FS5,8, NOTE_FS5,8,NOTE_D5,8, NOTE_B4,8, REST,8, NOTE_B4,8, REST,8, NOTE_E5,8, 
+  REST,8, NOTE_E5,8, REST,8, NOTE_E5,8, NOTE_GS5,8, NOTE_GS5,8, NOTE_A5,8, NOTE_B5,8,
+  
+  NOTE_A5,8, NOTE_A5,8, NOTE_A5,8, NOTE_E5,8, REST,8, NOTE_D5,8, REST,8, NOTE_FS5,8, 
+  REST,8, NOTE_FS5,8, REST,8, NOTE_FS5,8, NOTE_E5,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,8,
+  
+};*/
+/*int melody[] = {
+
+  // Keyboard cat
+  // Score available at https://musescore.com/user/142788/scores/147371
+
+    REST,1,
+    REST,1,
+    NOTE_C4,4, NOTE_E4,4, NOTE_G4,4, NOTE_E4,4, 
+    NOTE_C4,4, NOTE_E4,8, NOTE_G4,-4, NOTE_E4,4,
+    NOTE_A3,4, NOTE_C4,4, NOTE_E4,4, NOTE_C4,4,
+    NOTE_A3,4, NOTE_C4,8, NOTE_E4,-4, NOTE_C4,4,
+    NOTE_G3,4, NOTE_B3,4, NOTE_D4,4, NOTE_B3,4,
+    NOTE_G3,4, NOTE_B3,8, NOTE_D4,-4, NOTE_B3,4,
+
+    NOTE_G3,4, NOTE_G3,8, NOTE_G3,-4, NOTE_G3,8, NOTE_G3,4, 
+    NOTE_G3,4, NOTE_G3,4, NOTE_G3,8, NOTE_G3,4,
+    NOTE_C4,4, NOTE_E4,4, NOTE_G4,4, NOTE_E4,4, 
+    NOTE_C4,4, NOTE_E4,8, NOTE_G4,-4, NOTE_E4,4,
+    NOTE_A3,4, NOTE_C4,4, NOTE_E4,4, NOTE_C4,4,
+    NOTE_A3,4, NOTE_C4,8, NOTE_E4,-4, NOTE_C4,4,
+    NOTE_G3,4, NOTE_B3,4, NOTE_D4,4, NOTE_B3,4,
+    NOTE_G3,4, NOTE_B3,8, NOTE_D4,-4, NOTE_B3,4,
+
+    NOTE_G3,-1, 
+  
+};*/
+int melody[] = {
+
+  // Nokia Ringtone 
+  // Score available at https://musescore.com/user/29944637/scores/5266155
+  
+  NOTE_E5, 8, NOTE_D5, 8, NOTE_FS4, 4, NOTE_GS4, 4, 
+  NOTE_CS5, 8, NOTE_B4, 8, NOTE_D4, 4, NOTE_E4, 4, 
+  NOTE_B4, 8, NOTE_A4, 8, NOTE_CS4, 4, NOTE_E4, 4,
+  NOTE_A4, 2, 
+};
 // sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 // there are two values per note (pitch and duration), so for each note there are four bytes
 int notes = sizeof(melody) / sizeof(melody[0]) / 2;
@@ -109,6 +168,8 @@ int notes = sizeof(melody) / sizeof(melody[0]) / 2;
 int wholenote = (60000 * 4) / tempo;
 
 int divider = 0, noteDuration = 0;
+
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -123,30 +184,64 @@ pinMode(motorright, OUTPUT);
 
 }
 
+
+
+
 void loop() {
   // put your main code here, to run repeatedly:
-digitalWrite(motorleft, HIGH);
-digitalWrite(motorright, HIGH);
 
-moveforward();
+// the robot is going to move forward, and the ultrasonic sensor is detecting the distance
+ultrasonic();
+  if (distance < 75) {
+    //Serial.println("stop");
+    //stopmotors();
+Serial.println("stopmotors");
 stopmotors();
+    
+    delay(100);
+  
+    music();
+  } else {
+    moveforward();
+    delay(100);
+      rightarm();
+    leftarm();
+    Serial.print("distance; ");
+    Serial.print(distance);
+    Serial.println("cm");
+  }
+  
+
+//moveforward();
+//delay(5000);
+
+//stopmotors();
+//delay(1000);
+
+  //ultrasonic();
+
+  // RIGHT ARM movement
+//  rightarm();
+
+  // MUSIC
+  //music();
+
+  //LEFT ARM movement
+  //leftarm();
+}
+
+void stopmotors(){
+digitalWrite(motorleft, LOW);
+digitalWrite(motorright, LOW);
+}
 
 void moveforward(){
 
+digitalWrite(motorleft, HIGH);
+digitalWrite(motorright, HIGH);
 
-//start here next class
 
-}
-  ultrasonic();
 
-  // RIGHT ARM movement
-  rightarm();
-
-  // MUSIC
-  music();
-
-  //LEFT ARM movement
-  leftarm();
 }
 
 void ultrasonic() {
@@ -156,13 +251,7 @@ void ultrasonic() {
   duration = pulseIn(echopin, HIGH);
 
   distance = 0.017 * duration;
-  if ((distance > 10) && (distance < 50)) {
-    Serial.println("stop");
-  } else {
-    Serial.print("distance; ");
-    Serial.print(distance);
-    Serial.println("cm");
-  }
+
 
   delay(300);
 
@@ -174,14 +263,14 @@ void rightarm() {
   for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     right_arm.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15ms for the servo to reach the position
+    delay(3);                       // waits 15ms for the servo to reach the position
   }
 
 }
 void leftarm() {
   for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
     left_arm.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(15);                       // waits 15ms for the servo to reach the position
+    delay(3);                       // waits 15ms for the servo to reach the position
   }
 }
 
@@ -210,7 +299,13 @@ void music() {
     // stop the waveform generation before the next note.
     noTone(buzzer);
   }
-
-
-
+  }
+void rotaterobot(){
+digitalWrite(motorleft, HIGH);
+digitalWrite(motorright, LOW);
+delay(5000);
+  
 }
+
+
+  
